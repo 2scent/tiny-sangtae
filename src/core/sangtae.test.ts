@@ -35,4 +35,30 @@ describe('sangtae', () => {
       expect(s.get()).toEqual(initialState);
     });
   });
+
+  describe('set', () => {
+    it('3과 함께 호출하면, 값을 3으로 바꾼다.', () => {
+      const s = sangtae(0);
+
+      s.set(3);
+
+      expect(s.get()).toEqual(3);
+    });
+
+    it('prev => prev + 1와 함께 호출하면, 이전 값에서 1을 더한다.', () => {
+      const s = sangtae(3);
+
+      s.set((prev) => prev + 1);
+
+      expect(s.get()).toEqual(4);
+    });
+
+    it('prev => prev - 5와 함께 호출하면, 이전 값에서 5를 뺀다.', () => {
+      const s = sangtae(3);
+
+      s.set((prev) => prev - 5);
+
+      expect(s.get()).toEqual(-2);
+    });
+  });
 });
