@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { sangtae } from './sangtae.ts';
 
 describe('sangtae', () => {
@@ -59,6 +59,66 @@ describe('sangtae', () => {
       s.set((prev) => prev - 5);
 
       expect(s.get()).toEqual(-2);
+    });
+  });
+
+  describe('subscribe', () => {
+    it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
+      const s = sangtae(0);
+      const callback = vi.fn();
+
+      s.subscribe(callback);
+      s.set(1);
+      s.set(2);
+      s.set(3);
+      s.set(4);
+      s.set(5);
+
+      expect(callback).toBeCalledTimes(5);
+    });
+
+    it('같은 값으로 변경한 경우, 콜백 함수를 호출하지 않는다.', () => {
+      const s = sangtae(0);
+      const callback = vi.fn();
+
+      s.subscribe(callback);
+      s.set(0);
+      s.set(0);
+      s.set(0);
+      s.set(0);
+      s.set(0);
+
+      expect(callback).not.toBeCalled();
+    });
+
+    it('콜백 함수를 2개 이상 등록할 수 있다.', () => {
+      const s = sangtae(0);
+      const callbacks = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
+
+      callbacks.forEach((callback) => s.subscribe(callback));
+      s.set(1);
+      s.set(2);
+      s.set(3);
+      s.set(4);
+      s.set(5);
+
+      callbacks.forEach((callback) => expect(callback).toBeCalledTimes(5));
+    });
+
+    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
+      const s = sangtae(0);
+      const callback = vi.fn();
+
+      const unsubscribe = s.subscribe(callback);
+      s.set(1);
+      s.set(2);
+      s.set(3);
+
+      unsubscribe();
+      s.set(4);
+      s.set(5);
+
+      expect(callback).toBeCalledTimes(3);
     });
   });
 });
