@@ -121,6 +121,32 @@ describe('sangtae', () => {
       expect(callback).not.toBeCalled();
     });
 
+    it('기존 배열을 직접 수정해서 set을 호출한 경우, 콜백 함수를 호출하지 않는다.', async () => {
+      const arr = [0, 1, 2, 3];
+      const s = sangtae(arr);
+      const callback = vi.fn();
+
+      s.subscribe(callback);
+      arr.push(4);
+      s.set(arr);
+      await sleep(100);
+
+      expect(callback).not.toBeCalled();
+    });
+
+    it('기존 객체를 직접 수정해서 set을 호출한 경우, 콜백 함수를 호출하지 않는다.', async () => {
+      const obj = { firstName: 'Hyanggi', lastName: 'Lee' };
+      const s = sangtae(obj);
+      const callback = vi.fn();
+
+      s.subscribe(callback);
+      obj.lastName = 'Kim';
+      s.set(obj);
+      await sleep(100);
+
+      expect(callback).not.toBeCalled();
+    });
+
     it('콜백 함수를 2개 이상 등록할 수 있다.', async () => {
       const s = sangtae(0);
       const callbacks = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
