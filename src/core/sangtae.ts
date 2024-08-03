@@ -10,6 +10,16 @@ interface Sangtae<State> {
   subscribe: (callback: Callback) => () => void;
 }
 
+function batch(callback: Callback) {
+  if (typeof window !== 'undefined') {
+    const id = requestAnimationFrame(callback);
+    return () => cancelAnimationFrame(id);
+  } else {
+    const id = setTimeout(callback, 0);
+    return () => clearTimeout(id);
+  }
+}
+
 export function sangtae<State>(initialState: State): Sangtae<State> {
   let state = initialState;
 
@@ -17,20 +27,33 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
 
   const get = () => state;
 
+  let nextQueue: Array<Next<State>> = [];
+  let cancelBatch: (() => void) | null = null;
+
   const set = (next: Next<State>) => {
-    const prev = state;
+    nextQueue.push(next);
+    cancelBatch?.();
 
-    if (typeof next === 'function') {
-      state = (next as NextFunction<State>)(state);
-    } else {
-      state = next;
-    }
+    cancelBatch = batch(() => {
+      const prev = state;
 
-    if (prev !== state) {
-      for (const callback of callbacks) {
-        callback();
+      for (const next of nextQueue) {
+        if (typeof next === 'function') {
+          state = (next as NextFunction<State>)(state);
+        } else {
+          state = next;
+        }
       }
-    }
+
+      nextQueue = [];
+      cancelBatch = null;
+
+      if (prev !== state) {
+        for (const callback of callbacks) {
+          callback();
+        }
+      }
+    });
   };
 
   const subscribe = (callback: Callback) => {
