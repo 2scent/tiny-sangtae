@@ -4,7 +4,7 @@ type Next<T> = T | NextFunction<T>;
 
 type Callback = () => void;
 
-interface Sangtae<State> {
+export interface Sangtae<State> {
   get: () => State;
   set: (next: Next<State>) => void;
   subscribe: (callback: Callback) => () => void;
