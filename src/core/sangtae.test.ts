@@ -1,9 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
+import { sleep } from './util.ts';
 import { sangtae } from './sangtae.ts';
 
 describe('sangtae', () => {
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
   describe('get', () => {
     it('초기값으로 0이 주어지면, 0을 리턴한다.', () => {
       const initialState = 0;
