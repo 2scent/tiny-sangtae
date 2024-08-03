@@ -1,8 +1,6 @@
-import type { Sangtae } from './sangtae.ts';
+import { Callback, Sangtae } from './sangtae.ts';
 
-export interface Computed<State> {
-  get: () => State;
-}
+export type Computed<State> = Omit<Sangtae<State>, 'set'>;
 
 export function computed<State>(
   sangtae: Sangtae<State>,
@@ -10,7 +8,12 @@ export function computed<State>(
 ): Computed<State> {
   const get = () => selector(sangtae.get());
 
+  const subscribe = (callback: Callback) => {
+    return sangtae.subscribe(callback);
+  };
+
   return {
     get,
+    subscribe,
   };
 }

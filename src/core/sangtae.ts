@@ -2,7 +2,7 @@ type NextFunction<T> = (prev: T) => T;
 
 type Next<T> = T | NextFunction<T>;
 
-type Callback = () => void;
+export type Callback = () => void;
 
 export interface Sangtae<State> {
   get: () => State;
