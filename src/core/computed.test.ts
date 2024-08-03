@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { sleep } from './util.ts';
 import { sangtae } from './sangtae.ts';
 import { computed } from './computed.ts';
@@ -27,6 +27,36 @@ describe('computed', () => {
       await sleep(100);
 
       expect(c.get()).toEqual(15);
+    });
+  });
+
+  describe('subscribe', () => {
+    it('상태가 변경되면, 등록한 콜백 함수를 호출한다.', async () => {
+      const s = sangtae(0);
+      const c = computed(s, (v) => v + 5);
+      const callback = vi.fn();
+
+      c.subscribe(callback);
+      s.set(1);
+      await sleep(100);
+
+      expect(callback).toBeCalled();
+    });
+
+    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', async () => {
+      const s = sangtae(0);
+      const c = computed(s, (v) => v + 5);
+      const callback = vi.fn();
+
+      const unsubscribe = c.subscribe(callback);
+      s.set(1);
+      await sleep(100);
+
+      unsubscribe();
+      s.set(2);
+      await sleep(100);
+
+      expect(callback).toHaveBeenCalledOnce();
     });
   });
 });
