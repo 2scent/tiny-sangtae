@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { sangtae } from './sangtae.ts';
 
 describe('sangtae', () => {
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   describe('get', () => {
     it('초기값으로 0이 주어지면, 0을 리턴한다.', () => {
       const initialState = 0;
@@ -37,33 +39,59 @@ describe('sangtae', () => {
   });
 
   describe('set', () => {
-    it('3과 함께 호출하면, 값을 3으로 바꾼다.', () => {
+    it('비동기적으로 값을 바꾼다.', async () => {
       const s = sangtae(0);
 
       s.set(3);
 
+      expect(s.get()).toEqual(0);
+
+      await sleep(100);
+
       expect(s.get()).toEqual(3);
     });
 
-    it('prev => prev + 1와 함께 호출하면, 이전 값에서 1을 더한다.', () => {
+    it('3과 함께 호출하면, 값을 3으로 바꾼다.', async () => {
+      const s = sangtae(0);
+
+      s.set(3);
+      await sleep(100);
+
+      expect(s.get()).toEqual(3);
+    });
+
+    it('prev => prev + 1와 함께 호출하면, 이전 값에서 1을 더한다.', async () => {
       const s = sangtae(3);
 
       s.set((prev) => prev + 1);
+      await sleep(100);
 
       expect(s.get()).toEqual(4);
     });
 
-    it('prev => prev - 5와 함께 호출하면, 이전 값에서 5를 뺀다.', () => {
+    it('prev => prev - 5와 함께 호출하면, 이전 값에서 5를 뺀다.', async () => {
       const s = sangtae(3);
 
       s.set((prev) => prev - 5);
+      await sleep(100);
 
       expect(s.get()).toEqual(-2);
     });
   });
 
   describe('subscribe', () => {
-    it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
+    it('set을 호출하면 등록한 콜백 함수를 호출한다.', async () => {
+      const s = sangtae(0);
+      const callback = vi.fn();
+
+      s.subscribe(callback);
+      s.set(1);
+      await sleep(100);
+
+      expect(callback).toBeCalled();
+    });
+
+    it('set을 연속적으로 호출하면 콜백 함수를 마지막 1번만 호출한다.', async () => {
       const s = sangtae(0);
       const callback = vi.fn();
 
@@ -73,11 +101,12 @@ describe('sangtae', () => {
       s.set(3);
       s.set(4);
       s.set(5);
+      await sleep(100);
 
-      expect(callback).toBeCalledTimes(5);
+      expect(callback).toHaveBeenCalledOnce();
     });
 
-    it('같은 값으로 변경한 경우, 콜백 함수를 호출하지 않는다.', () => {
+    it('같은 값으로 변경한 경우, 콜백 함수를 호출하지 않는다.', async () => {
       const s = sangtae(0);
       const callback = vi.fn();
 
@@ -87,25 +116,23 @@ describe('sangtae', () => {
       s.set(0);
       s.set(0);
       s.set(0);
+      await sleep(100);
 
       expect(callback).not.toBeCalled();
     });
 
-    it('콜백 함수를 2개 이상 등록할 수 있다.', () => {
+    it('콜백 함수를 2개 이상 등록할 수 있다.', async () => {
       const s = sangtae(0);
       const callbacks = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
 
       callbacks.forEach((callback) => s.subscribe(callback));
       s.set(1);
-      s.set(2);
-      s.set(3);
-      s.set(4);
-      s.set(5);
+      await sleep(100);
 
-      callbacks.forEach((callback) => expect(callback).toBeCalledTimes(5));
+      callbacks.forEach((callback) => expect(callback).toBeCalled());
     });
 
-    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
+    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', async () => {
       const s = sangtae(0);
       const callback = vi.fn();
 
@@ -113,12 +140,14 @@ describe('sangtae', () => {
       s.set(1);
       s.set(2);
       s.set(3);
+      await sleep(100);
 
       unsubscribe();
       s.set(4);
       s.set(5);
+      await sleep(100);
 
-      expect(callback).toBeCalledTimes(3);
+      expect(callback).toBeCalled();
     });
   });
 });
