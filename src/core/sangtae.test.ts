@@ -163,16 +163,13 @@ describe('sangtae', () => {
 
       const unsubscribe = s.subscribe(callback);
       s.set(1);
-      s.set(2);
-      s.set(3);
       await sleep(100);
 
       unsubscribe();
-      s.set(4);
-      s.set(5);
+      s.set(2);
       await sleep(100);
 
-      expect(callback).toBeCalled();
+      expect(callback).toHaveBeenCalledOnce();
     });
   });
 });
