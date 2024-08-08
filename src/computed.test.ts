@@ -12,9 +12,12 @@ describe('computed', () => {
       expect(c.get()).toEqual(5);
     });
 
-    it('selector로 () => 10이 주어지면, 상태에 상관 없이 10을 리턴한다.', () => {
+    it('selector로 () => 10이 주어지면, 상태에 상관 없이 10을 리턴한다.', async () => {
       const s = sangtae(0);
       const c = computed(s, () => 10);
+
+      s.set(10);
+      await sleep(100);
 
       expect(c.get()).toEqual(10);
     });
