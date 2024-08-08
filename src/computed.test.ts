@@ -4,72 +4,72 @@ import { computed } from './computed.ts';
 
 describe('computed', () => {
   describe('get', () => {
-    it('selector로 v => v + 5가 주어지면, 상태에 5를 더한 값을 리턴한다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, (v) => v + 5);
+    it('상태가 "Lee"일 때, selector가 v => v + " Hyanggi"이면, "Lee Hyanggi"를 리턴한다.', () => {
+      const s = sangtae('Lee');
+      const c = computed(s, (v) => v + ' Hyanggi');
 
-      expect(c.get()).toEqual(5);
+      expect(c.get()).toEqual('Lee Hyanggi');
     });
 
-    it('selector로 () => 10이 주어지면, 상태에 상관 없이 10을 리턴한다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, () => 10);
+    it('selector가 () => "Hyanggi"이면, 상태에 상관 없이 "Hyanggi"를 리턴한다.', () => {
+      const s = sangtae('Lee');
+      const c = computed(s, () => 'Hyanggi');
 
-      s.set(10);
+      s.set('Kim');
 
-      expect(c.get()).toEqual(10);
+      expect(c.get()).toEqual('Hyanggi');
     });
 
     it('상태가 변경되면, 변경된 상태에 selector를 적용한 값을 리턴한다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, (v) => v + 5);
+      const s = sangtae('Lee');
+      const c = computed(s, (v) => v + ' Hyanggi');
 
-      s.set(10);
+      s.set('Kim');
 
-      expect(c.get()).toEqual(15);
+      expect(c.get()).toEqual('Kim Hyanggi');
     });
   });
 
   describe('subscribe', () => {
     it('상태가 변경되면, 등록한 콜백 함수를 호출한다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, (v) => v + 5);
+      const s = sangtae('Lee');
+      const c = computed(s, (v) => v + ' Hyanggi');
       const callback = vi.fn();
 
       c.subscribe(callback);
-      s.set(1);
+      s.set('Kim');
 
       expect(callback).toBeCalled();
     });
 
     it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, (v) => v + 5);
+      const s = sangtae('Lee');
+      const c = computed(s, (v) => v + ' Hyanggi');
       const callback = vi.fn();
 
       c.subscribe(callback);
-      s.set(1);
-      s.set(2);
-      s.set(3);
-      s.set(4);
-      s.set(5);
+      s.set('Kim');
+      s.set('Park');
+      s.set('Jung');
+      s.set('Choi');
+      s.set('Kang');
 
       expect(callback).toBeCalledTimes(5);
     });
 
     it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
-      const s = sangtae(0);
-      const c = computed(s, (v) => v + 5);
+      const s = sangtae('Lee');
+      const c = computed(s, (v) => v + ' Hyanggi');
       const callback = vi.fn();
 
       const unsubscribe = c.subscribe(callback);
-      s.set(1);
-      s.set(2);
-      s.set(3);
+      s.set('Kim');
+      s.set('Park');
+      s.set('Jung');
 
       unsubscribe();
-      s.set(4);
-      s.set(5);
+      s.set('Choi');
+      s.set('Kang');
 
       expect(callback).toBeCalledTimes(3);
     });

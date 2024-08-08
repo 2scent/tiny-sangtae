@@ -37,12 +37,12 @@ describe('sangtae', () => {
   });
 
   describe('set', () => {
-    it('수와 함께 호출하면, 값을 주어진 수로 바꾼다.', () => {
-      const s = sangtae(0);
+    it('주어진 값으로 상태를 바꾼다.', () => {
+      const s = sangtae('Lee');
 
-      s.set(3);
+      s.set('Kim');
 
-      expect(s.get()).toEqual(3);
+      expect(s.get()).toEqual('Kim');
     });
 
     it('prev => prev + 1와 함께 호출하면, 이전 값에서 1을 더한다.', () => {
@@ -64,66 +64,66 @@ describe('sangtae', () => {
 
   describe('subscribe', () => {
     it('set을 호출하면 등록한 콜백 함수를 호출한다.', () => {
-      const s = sangtae(0);
+      const s = sangtae('Lee');
       const callback = vi.fn();
 
       s.subscribe(callback);
-      s.set(1);
+      s.set('Kim');
 
       expect(callback).toBeCalled();
     });
 
     it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
-      const s = sangtae(0);
+      const s = sangtae('Lee');
       const callback = vi.fn();
 
       s.subscribe(callback);
-      s.set(1);
-      s.set(2);
-      s.set(3);
-      s.set(4);
-      s.set(5);
+      s.set('Kim');
+      s.set('Park');
+      s.set('Jung');
+      s.set('Choi');
+      s.set('Kang');
 
       expect(callback).toBeCalledTimes(5);
     });
 
     it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
-      const s = sangtae(0);
+      const s = sangtae('Lee');
       const callback = vi.fn();
 
       const unsubscribe = s.subscribe(callback);
-      s.set(1);
-      s.set(2);
-      s.set(3);
+      s.set('Kim');
+      s.set('Park');
+      s.set('Jung');
 
       unsubscribe();
-      s.set(4);
-      s.set(5);
+      s.set('Choi');
+      s.set('Kang');
 
       expect(callback).toBeCalledTimes(3);
     });
 
     it('같은 값으로 변경한 경우, 콜백 함수를 호출하지 않는다.', () => {
-      const s = sangtae(0);
+      const s = sangtae('Lee');
       const callback = vi.fn();
 
       s.subscribe(callback);
-      s.set(0);
-      s.set(0);
-      s.set(0);
-      s.set(0);
-      s.set(0);
+      s.set('Lee');
+      s.set('Lee');
+      s.set('Lee');
+      s.set('Lee');
+      s.set('Lee');
 
       expect(callback).not.toBeCalled();
     });
 
     it('기존 배열을 직접 수정해서 set을 호출한 경우, 콜백 함수를 호출하지 않는다.', () => {
-      const arr = [0, 1, 2, 3];
+      const arr = ['Lee', 'Kim', 'Park', 'Jung'];
       const s = sangtae(arr);
       const callback = vi.fn();
 
       s.subscribe(callback);
-      arr.push(4);
+      arr.push('Choi');
       s.set(arr);
 
       expect(callback).not.toBeCalled();
@@ -142,11 +142,11 @@ describe('sangtae', () => {
     });
 
     it('콜백 함수를 2개 이상 등록할 수 있다.', () => {
-      const s = sangtae(0);
+      const s = sangtae('Lee');
       const callbacks = [vi.fn(), vi.fn(), vi.fn(), vi.fn()];
 
       callbacks.forEach((callback) => s.subscribe(callback));
-      s.set(1);
+      s.set('Kim');
 
       callbacks.forEach((callback) => expect(callback).toBeCalled());
     });
