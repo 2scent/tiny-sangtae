@@ -1,4 +1,5 @@
-import { Callback, Sangtae } from './sangtae.ts';
+import { Sangtae } from './sangtae.ts';
+import { Callback } from './type.ts';
 
 /**
  * Represents a computed state derived from another state, without the ability to set it directly

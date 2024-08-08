@@ -1,3 +1,6 @@
+import { registerCallback, isActionRunning } from './action.ts';
+import type { Callback } from './type.ts';
+
 /**
  * A function type that takes the previous state and returns a new state
  * @template T The type of the state
@@ -9,11 +12,6 @@ type NextFunction<T> = (prev: T) => T;
  * @template T The type of the state
  */
 type Next<T> = T | NextFunction<T>;
-
-/**
- * Callback function type
- */
-export type Callback = () => void;
 
 /**
  * Interface for state management
@@ -47,6 +45,14 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
 
   const get = () => state;
 
+  const callbackKey = Symbol('sangtae');
+
+  const runCallbacks = () => {
+    for (const callback of callbacks) {
+      callback();
+    }
+  };
+
   const set = (next: Next<State>) => {
     const prev = state;
 
@@ -57,8 +63,10 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
     }
 
     if (prev !== state) {
-      for (const callback of callbacks) {
-        callback();
+      if (isActionRunning()) {
+        registerCallback(callbackKey, runCallbacks);
+      } else {
+        runCallbacks();
       }
     }
   };
