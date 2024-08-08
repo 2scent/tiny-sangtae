@@ -40,22 +40,6 @@ export interface Sangtae<State> {
   subscribe: (callback: Callback) => () => void;
 }
 
-function batch(callback: Callback) {
-  if (typeof window !== 'undefined') {
-    const id = requestAnimationFrame(callback);
-    return () => cancelAnimationFrame(id);
-  } else {
-    const id = setTimeout(callback, 0);
-    return () => clearTimeout(id);
-  }
-}
-
-/**
- * Creates a state management object
- * @template State The type of the state
- * @param {State} initialState The initial state
- * @returns {Sangtae<State>} A state management object
- */
 export function sangtae<State>(initialState: State): Sangtae<State> {
   let state = initialState;
 
@@ -63,33 +47,20 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
 
   const get = () => state;
 
-  let nextQueue: Array<Next<State>> = [];
-  let cancelBatch: (() => void) | null = null;
-
   const set = (next: Next<State>) => {
-    nextQueue.push(next);
-    cancelBatch?.();
+    const prev = state;
 
-    cancelBatch = batch(() => {
-      const prev = state;
+    if (typeof next === 'function') {
+      state = (next as NextFunction<State>)(state);
+    } else {
+      state = next;
+    }
 
-      for (const next of nextQueue) {
-        if (typeof next === 'function') {
-          state = (next as NextFunction<State>)(state);
-        } else {
-          state = next;
-        }
+    if (prev !== state) {
+      for (const callback of callbacks) {
+        callback();
       }
-
-      nextQueue = [];
-      cancelBatch = null;
-
-      if (prev !== state) {
-        for (const callback of callbacks) {
-          callback();
-        }
-      }
-    });
+    }
   };
 
   const subscribe = (callback: Callback) => {
