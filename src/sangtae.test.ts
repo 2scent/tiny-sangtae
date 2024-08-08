@@ -4,7 +4,7 @@ import { sangtae } from './sangtae.ts';
 
 describe('sangtae', () => {
   describe('get', () => {
-    it('초기값으로 0이 주어지면, 0을 리턴한다.', () => {
+    it('초기값으로 수가 주어지면, 동일한 수를 리턴한다.', () => {
       const initialState = 0;
 
       const s = sangtae(initialState);
@@ -12,7 +12,7 @@ describe('sangtae', () => {
       expect(s.get()).toEqual(initialState);
     });
 
-    it('초기값으로 "sangtae"가 주어지면, "sangtae"를 리턴한다.', () => {
+    it('초기값으로 문자열이 주어지면, 동일한 문자열을 리턴한다.', () => {
       const initialState = 'sangtae';
 
       const s = sangtae(initialState);
@@ -20,7 +20,7 @@ describe('sangtae', () => {
       expect(s.get()).toEqual(initialState);
     });
 
-    it('초기값으로 [1, 3, 5, 4]가 주어지면, [1, 3, 5, 4]를 리턴한다.', () => {
+    it('초기값으로 배열이 주어지면, 동일한 배열을 리턴한다.', () => {
       const initialState = [1, 3, 5, 4];
 
       const s = sangtae(initialState);
@@ -28,7 +28,7 @@ describe('sangtae', () => {
       expect(s.get()).toEqual(initialState);
     });
 
-    it('초기값으로 {firstName: "Hyanggi", lastName: "Lee"}가 주어지면, {firstName: "Hyanggi", lastName: "Lee"}를 리턴한다.', () => {
+    it('초기값으로 객체가 주어지면, 동일한 객체를 리턴한다.', () => {
       const initialState = { firstName: 'Hyanggi', lastName: 'Lee' };
 
       const s = sangtae(initialState);
@@ -50,7 +50,7 @@ describe('sangtae', () => {
       expect(s.get()).toEqual(3);
     });
 
-    it('3과 함께 호출하면, 값을 3으로 바꾼다.', async () => {
+    it('수와 함께 호출하면, 값을 주어진 수로 바꾼다.', async () => {
       const s = sangtae(0);
 
       s.set(3);
