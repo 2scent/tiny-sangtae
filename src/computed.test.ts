@@ -42,6 +42,21 @@ describe('computed', () => {
       expect(callback).toBeCalled();
     });
 
+    it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
+      const s = sangtae(0);
+      const c = computed(s, (v) => v + 5);
+      const callback = vi.fn();
+
+      c.subscribe(callback);
+      s.set(1);
+      s.set(2);
+      s.set(3);
+      s.set(4);
+      s.set(5);
+
+      expect(callback).toBeCalledTimes(5);
+    });
+
     it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
       const s = sangtae(0);
       const c = computed(s, (v) => v + 5);
@@ -49,11 +64,14 @@ describe('computed', () => {
 
       const unsubscribe = c.subscribe(callback);
       s.set(1);
+      s.set(2);
+      s.set(3);
 
       unsubscribe();
-      s.set(2);
+      s.set(4);
+      s.set(5);
 
-      expect(callback).toHaveBeenCalledOnce();
+      expect(callback).toBeCalledTimes(3);
     });
   });
 });

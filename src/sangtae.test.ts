@@ -87,6 +87,22 @@ describe('sangtae', () => {
       expect(callback).toBeCalledTimes(5);
     });
 
+    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
+      const s = sangtae(0);
+      const callback = vi.fn();
+
+      const unsubscribe = s.subscribe(callback);
+      s.set(1);
+      s.set(2);
+      s.set(3);
+
+      unsubscribe();
+      s.set(4);
+      s.set(5);
+
+      expect(callback).toBeCalledTimes(3);
+    });
+
     it('같은 값으로 변경한 경우, 콜백 함수를 호출하지 않는다.', () => {
       const s = sangtae(0);
       const callback = vi.fn();
@@ -133,19 +149,6 @@ describe('sangtae', () => {
       s.set(1);
 
       callbacks.forEach((callback) => expect(callback).toBeCalled());
-    });
-
-    it('리턴한 함수 "unsubscribe"를 호출하면 더 이상 콜백을 호출하지 않는다.', () => {
-      const s = sangtae(0);
-      const callback = vi.fn();
-
-      const unsubscribe = s.subscribe(callback);
-      s.set(1);
-
-      unsubscribe();
-      s.set(2);
-
-      expect(callback).toHaveBeenCalledOnce();
     });
   });
 });
