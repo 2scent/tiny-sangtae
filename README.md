@@ -17,7 +17,7 @@ npm install tiny-sangtae
 `sangtae` can be used to store string, number, array and any type.
 
 ```typescript
-import { sangtae } from 'sangtae';
+import { sangtae } from 'tiny-sangtae';
 
 const $counter = sangtae(0);
 ```
@@ -75,7 +75,7 @@ $counter.set(3);
 `computed` can create derived state from `sangtae`.
 
 ```typescript
-import { computed, sangtae } from 'sangtae';
+import { computed, sangtae } from 'tiny-sangtae';
 
 const $lastName = sangtae('Lee');
 const $fullName = computed($lastName, (ln) => ln + ' Hyanggi');
