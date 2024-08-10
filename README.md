@@ -27,13 +27,13 @@ import { sangtae } from 'sangtae';
 const $counter = sangtae(0);
 ```
 
-`get` can retrieve the saved state.
+`get` can get the saved state.
 
 ```typescript
 console.log($counter.get()); // 0
 ```
 
-`set` can modify the saved state.
+`set` can set the saved state.
 
 ```typescript
 $counter.set(1);
@@ -48,19 +48,19 @@ $counter.set((v) => v + 5);
 console.log($counter.get()); // 10
 ```
 
-`subscribe` allows you to register a `callback` that will be called whenever the value changes.
+`subscribe` allows you to register a `callback` that will be called when the state changes.
 
 ```typescript
 $counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
 $counter.set(1); // $counter: 1
 ```
 
-If `set` is called consecutively, the `callback` is executed only once at the end.
+The `callback` is called as many times as the set is invoked.
 
 ```typescript
 $counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
-$counter.set(1);
-$counter.set(2);
+$counter.set(1); // $counter: 1
+$counter.set(2); // $counter: 2
 $counter.set(3); // $counter: 3
 ```
 
@@ -71,7 +71,8 @@ const unsubscribe = $counter.subscribe(() => console.log(`$counter: ${$counter.g
 $counter.set(1); // $counter: 1
 
 unsubscribe();
-$counter.set(5);
+$counter.set(2);
+$counter.set(3);
 ```
 
 ### Computed
@@ -103,19 +104,34 @@ unsubscribe();
 $lastName.set('Choi');
 ```
 
+### Action
+
+If `set` is called consecutively in `action`, the `callback` is called only once at the end.
+
+```typescript
+$counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
+action(() => {
+  $counter.set(1);
+  $counter.set(2);
+  $counter.set(3); // $counter: 3
+});
+```
+
 ## Integration
 
 ### React
 
+Use [`@tiny-sangtae/react`](https://github.com/2scent/tiny-sangtae-react) and `useSangtae()` to get the state, and the component will re-render when `sangtae` changes.
+
 ```tsx
-// src/stores/counter.ts
-import { sangate } from 'tiny-sangtae';
+// counter.ts
+import { sangtae } from 'tiny-sangtae';
 
 export const $counter = sangtae(0);
 
-// src/components/Counter.tsx
+// Counter.tsx
 import { useStore } from '@tiny-sangtae/react';
-import { $counter } from '../stores/counter';
+import { $counter } from './counter';
 
 export default function Counter() {
   const [counter, setCounter] = useStore($counter);
