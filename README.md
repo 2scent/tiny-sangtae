@@ -10,11 +10,6 @@ Tiny Sangtae is a state management library written in TypeScript. It can be used
 npm install tiny-sangtae
 ```
 
-## Smart Stores
-
-- Persistent (not yet)
-- Query (not yet)
-
 ## Usage
 
 ### Sangtae
