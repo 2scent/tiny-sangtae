@@ -1,5 +1,5 @@
 import { Sangtae } from './sangtae.ts';
-import { Callback } from './type.ts';
+import { SubscribeCallback } from './type.ts';
 
 /**
  * Represents a computed value that can be retrieved and subscribed to.
@@ -16,7 +16,7 @@ export interface Computed<Result> {
    * @param callback The function to be called when the result changes.
    * @returns {() => void} A function to unsubscribe from the changes.
    */
-  subscribe: (callback: Callback) => () => void;
+  subscribe: (callback: SubscribeCallback<Result>) => () => void;
 }
 
 /**
@@ -31,8 +31,8 @@ export function computed<State, Result>(
 ): Computed<Result> {
   const get = () => selector(sangtae.get());
 
-  const subscribe = (callback: Callback) => {
-    return sangtae.subscribe(callback);
+  const subscribe = (callback: SubscribeCallback<Result>) => {
+    return sangtae.subscribe(() => callback(get()));
   };
 
   return {

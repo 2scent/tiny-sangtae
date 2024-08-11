@@ -1,5 +1,5 @@
 import { registerCallback, isActionRunning } from './action.ts';
-import type { Callback } from './type.ts';
+import type { SubscribeCallback } from './type.ts';
 
 /**
  * A function type that takes the previous state and returns a new state
@@ -35,13 +35,13 @@ export interface Sangtae<State> {
    * @param {Callback} callback The function to be called when the state changes
    * @returns {() => void} A function to unsubscribe
    */
-  subscribe: (callback: Callback) => () => void;
+  subscribe: (callback: SubscribeCallback<State>) => () => void;
 }
 
 export function sangtae<State>(initialState: State): Sangtae<State> {
   let state = initialState;
 
-  const callbacks = new Set<Callback>();
+  const callbacks = new Set<SubscribeCallback<State>>();
 
   const get = () => state;
 
@@ -49,7 +49,7 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
 
   const runCallbacks = () => {
     for (const callback of callbacks) {
-      callback();
+      callback(state);
     }
   };
 
@@ -71,7 +71,7 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
     }
   };
 
-  const subscribe = (callback: Callback) => {
+  const subscribe = (callback: SubscribeCallback<State>) => {
     callbacks.add(callback);
     return () => {
       callbacks.delete(callback);
