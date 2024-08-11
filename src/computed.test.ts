@@ -3,6 +3,15 @@ import { sangtae } from './sangtae.ts';
 import { computed } from './computed.ts';
 
 describe('computed', () => {
+  it('sangtae 또는 computed를 기반으로 파생 상태를 만든다.', () => {
+    const s = sangtae('Lee');
+    const c1 = computed(s, (v) => ({ lastName: v }));
+    const c2 = computed(c1, (v) => ({ ...v, firstName: 'Hyanggi' }));
+
+    expect(c1.get()).toEqual({ lastName: 'Lee' });
+    expect(c2.get()).toEqual({ lastName: 'Lee', firstName: 'Hyanggi' });
+  });
+
   describe('get', () => {
     it('상태가 "Lee"일 때, selector가 v => v + " Hyanggi"이면, "Lee Hyanggi"를 리턴한다.', () => {
       const s = sangtae('Lee');
