@@ -2,22 +2,33 @@ import { Sangtae } from './sangtae.ts';
 import { Callback } from './type.ts';
 
 /**
- * Represents a computed state derived from another state, without the ability to set it directly
- * @template State The type of the state
+ * Represents a computed value that can be retrieved and subscribed to.
  */
-export type Computed<State> = Omit<Sangtae<State>, 'set'>;
+export interface Computed<Result> {
+  /**
+   * Retrieves the current computed result.
+   * @returns The current computed result.
+   */
+  get: () => Result;
+
+  /**
+   * Subscribes to changes in the computed result.
+   * @param callback The function to be called when the result changes.
+   * @returns {() => void} A function to unsubscribe from the changes.
+   */
+  subscribe: (callback: Callback) => () => void;
+}
 
 /**
- * Creates a computed state object based on a selector function applied to another state
- * @template State The type of the state
- * @param {Sangtae<State>} sangtae The original state object
- * @param {function(State): State} selector A function that selects or transforms the original state
- * @returns {Computed<State>} A computed state object
+ * Creates a computed value based on a Sangtae state and a selector function.
+ * @param sangtae The Sangtae state object.
+ * @param selector A function that computes the result from the state.
+ * @returns A Computed object for the computed result.
  */
-export function computed<State>(
-  sangtae: Sangtae<State>,
-  selector: (value: State) => State,
-): Computed<State> {
+export function computed<State, Result>(
+  sangtae: Sangtae<State> | Computed<State>,
+  selector: (value: State) => Result,
+): Computed<Result> {
   const get = () => selector(sangtae.get());
 
   const subscribe = (callback: Callback) => {
