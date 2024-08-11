@@ -63,14 +63,14 @@ describe('sangtae', () => {
   });
 
   describe('subscribe', () => {
-    it('set을 호출하면 등록한 콜백 함수를 호출한다.', () => {
+    it('set을 호출하면 현재 상태와 함께 등록한 콜백 함수를 호출한다.', () => {
       const s = sangtae('Lee');
       const callback = vi.fn();
 
       s.subscribe(callback);
       s.set('Kim');
 
-      expect(callback).toBeCalled();
+      expect(callback).toBeCalledWith('Kim');
     });
 
     it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {

@@ -16,6 +16,7 @@ describe('action', () => {
     });
 
     expect(callback).toHaveBeenCalledOnce();
+    expect(callback).toHaveBeenCalledWith('hello');
   });
 
   it('여러 action으로 나눠서 set을 호출할 경우, action 수만큼 콜백 함수를 호출한다.', () => {
@@ -49,7 +50,10 @@ describe('action', () => {
       s.set('hello');
     });
 
-    callbacks.forEach((callback) => expect(callback).toHaveBeenCalledOnce());
+    callbacks.forEach((callback) => {
+      expect(callback).toHaveBeenCalledOnce();
+      expect(callback).toHaveBeenCalledWith('hello');
+    });
   });
 
   it('computed로 파생한 상태의 콜백 함수도 마지막 한 번만 호출한다.', () => {
@@ -68,6 +72,9 @@ describe('action', () => {
     });
 
     expect(sCallback).toHaveBeenCalledOnce();
+    expect(sCallback).toHaveBeenCalledWith('hello');
+
     expect(cCallback).toHaveBeenCalledOnce();
+    expect(cCallback).toHaveBeenCalledWith('인사말: hello');
   });
 });

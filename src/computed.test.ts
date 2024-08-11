@@ -40,7 +40,7 @@ describe('computed', () => {
   });
 
   describe('subscribe', () => {
-    it('상태가 변경되면, 등록한 콜백 함수를 호출한다.', () => {
+    it('상태가 변경되면, 등록한 콜백 함수를 파생된 상태와 함께 호출한다.', () => {
       const s = sangtae('Lee');
       const c = computed(s, (v) => v + ' Hyanggi');
       const callback = vi.fn();
@@ -48,7 +48,7 @@ describe('computed', () => {
       c.subscribe(callback);
       s.set('Kim');
 
-      expect(callback).toBeCalled();
+      expect(callback).toHaveBeenCalledWith('Kim Hyanggi');
     });
 
     it('set을 호출한 만큼 등록한 콜백 함수를 호출한다.', () => {
