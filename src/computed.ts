@@ -1,29 +1,59 @@
 import { Sangtae } from './sangtae.ts';
 import { SubscribeCallback } from './type.ts';
 
-/**
- * Represents a computed value that can be retrieved and subscribed to.
- */
-export type Computed<Result> = Omit<Sangtae<Result>, 'set'>;
+export type Computed<Select> = Omit<Sangtae<Select>, 'set'>;
 
-/**
- * Creates a computed value based on a Sangtae state and a selector function.
- * @param sangtae The Sangtae state object.
- * @param selector A function that computes the result from the state.
- * @returns A Computed object for the computed result.
- */
-export function computed<State, Result>(
-  sangtae: Sangtae<State> | Computed<State>,
-  selector: (value: State) => Result,
-): Computed<Result> {
-  const get = () => selector(sangtae.get());
+type ComputedList<States extends Array<unknown>> = {
+  [K in keyof States]: Computed<States[K]>;
+};
 
-  const subscribe = (callback: SubscribeCallback<Result>, key?: unknown) => {
-    return sangtae.subscribe(() => callback(get()), key);
+type Selector<State, Select> = (state: State) => Select;
+
+type ListSelector<States extends Array<unknown>, Select> = (...states: States) => Select;
+
+export function computed<State, Select>(
+  sangtae: Computed<State>,
+  selector: Selector<State, Select>,
+): Computed<Select>;
+
+export function computed<States extends Array<unknown>, Select>(
+  sangtaes: ComputedList<States>,
+  selector: ListSelector<States, Select>,
+): Computed<Select>;
+
+export function computed<State, States extends Array<unknown>, Select>(
+  sangtae: Computed<State> | ComputedList<States>,
+  selector: Selector<State, Select> | ListSelector<States, Select>,
+): Computed<Select> {
+  if (Array.isArray(sangtae)) {
+    const states = sangtae as ComputedList<States>;
+    const select = selector as ListSelector<States, Select>;
+
+    const get = () => select(...(states.map((s) => s.get()) as States));
+
+    const subscribe = (
+      callback: SubscribeCallback<Select>,
+      key: unknown = Symbol(callback.name),
+    ) => {
+      const unsubscribes = states.map((s) => s.subscribe(() => callback(get()), key));
+      return () => {
+        for (const unsubscribe of unsubscribes) {
+          unsubscribe();
+        }
+      };
+    };
+
+    return { get, subscribe };
+  }
+
+  const state = sangtae as Computed<State>;
+  const select = selector as Selector<State, Select>;
+
+  const get = () => select(state.get());
+
+  const subscribe = (callback: SubscribeCallback<Select>, key?: unknown) => {
+    return state.subscribe(() => callback(get()), key);
   };
 
-  return {
-    get,
-    subscribe,
-  };
+  return { get, subscribe };
 }
