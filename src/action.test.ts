@@ -77,4 +77,24 @@ describe('action', () => {
     expect(cCallback).toHaveBeenCalledOnce();
     expect(cCallback).toHaveBeenCalledWith('인사말: hello');
   });
+
+  it('action이 중첩된 경우, action 수만큼 콜백 함수를 호출한다.', () => {
+    const s = sangtae('안녕');
+    const callback = vi.fn();
+    s.subscribe(callback);
+
+    action(() => {
+      s.set('안녕하세요');
+
+      action(() => {
+        s.set('hi');
+      });
+
+      s.set('hello');
+    });
+
+    expect(callback).toHaveBeenCalledTimes(2);
+    expect(callback).toHaveBeenNthCalledWith(1, 'hi');
+    expect(callback).toHaveBeenNthCalledWith(2, 'hello');
+  });
 });
