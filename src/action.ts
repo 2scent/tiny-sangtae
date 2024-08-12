@@ -1,11 +1,6 @@
 import type { Callback } from './type.ts';
 
-/**
- * Represents a pair of a symbol and a callback function.
- */
-type CallbackPair = [symbol, Callback];
-
-let callbackPairs: CallbackPair[] = [];
+const callbackMap = new Map<unknown, Callback>();
 
 /**
  * Registers a new callback function associated with the given key.
@@ -13,8 +8,8 @@ let callbackPairs: CallbackPair[] = [];
  * @param {Callback} callback - The callback function to be registered.
  * @returns {void}
  */
-export function registerCallback(key: symbol, callback: Callback): void {
-  callbackPairs.push([key, callback]);
+export function registerCallback(key: unknown, callback: Callback): void {
+  callbackMap.set(key, callback);
 }
 
 let actionCount = 0;
@@ -37,16 +32,10 @@ export function action(act: Callback): void {
 
   act();
 
-  const callbackMap = new Map<symbol, Callback>();
-
-  for (const [key, callback] of callbackPairs) {
-    callbackMap.set(key, callback);
-  }
-  callbackPairs = [];
-
   for (const [, callback] of callbackMap) {
     callback();
   }
+  callbackMap.clear();
 
   actionCount--;
 }

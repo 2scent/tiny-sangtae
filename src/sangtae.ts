@@ -35,20 +35,24 @@ export interface Sangtae<State> {
    * @param {Callback} callback The function to be called when the state changes
    * @returns {() => void} A function to unsubscribe
    */
-  subscribe: (callback: SubscribeCallback<State>) => () => void;
+  subscribe: (callback: SubscribeCallback<State>, key?: unknown) => () => void;
 }
 
 export function sangtae<State>(initialState: State): Sangtae<State> {
   let state = initialState;
 
-  const callbacks = new Set<SubscribeCallback<State>>();
+  const callbackMap = new Map<unknown, SubscribeCallback<State>>();
 
   const get = () => state;
 
-  const callbackKey = Symbol('sangtae');
+  const registerCallbacks = () => {
+    for (const [key, callback] of callbackMap) {
+      registerCallback(key, () => callback(state));
+    }
+  };
 
   const runCallbacks = () => {
-    for (const callback of callbacks) {
+    for (const [, callback] of callbackMap) {
       callback(state);
     }
   };
@@ -64,17 +68,17 @@ export function sangtae<State>(initialState: State): Sangtae<State> {
 
     if (prev !== state) {
       if (isActionRunning()) {
-        registerCallback(callbackKey, runCallbacks);
+        registerCallbacks();
       } else {
         runCallbacks();
       }
     }
   };
 
-  const subscribe = (callback: SubscribeCallback<State>) => {
-    callbacks.add(callback);
+  const subscribe = (callback: SubscribeCallback<State>, key: unknown = Symbol(callback.name)) => {
+    callbackMap.set(key, callback);
     return () => {
-      callbacks.delete(callback);
+      callbackMap.delete(key);
     };
   };
 
