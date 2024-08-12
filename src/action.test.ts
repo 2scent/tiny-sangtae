@@ -1,15 +1,24 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { sangtae } from './sangtae.ts';
 import { action } from './action.ts';
 import { computed } from './computed.ts';
 
 describe('action', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('action에서 set을 연속적으로 호출하면, 콜백 함수를 마지막 한 번만 호출한다.', () => {
     const s = sangtae('안녕');
     const callback = vi.fn();
     s.subscribe(callback);
 
     action(() => {
+      s.set('반갑습니다');
       s.set('안녕하세요');
       s.set('hi');
       s.set('hello');
@@ -17,6 +26,27 @@ describe('action', () => {
 
     expect(callback).toHaveBeenCalledOnce();
     expect(callback).toHaveBeenCalledWith('hello');
+  });
+
+  it('action에서 비동기 작업을 호출한 경우, 이후 작업은 action에 포함하지 않는다.', async () => {
+    const s = sangtae('안녕');
+    const callback = vi.fn();
+    s.subscribe(callback);
+
+    action(async () => {
+      s.set('반갑습니다');
+      s.set('안녕하세요');
+      await vi.advanceTimersToNextTimerAsync();
+
+      s.set('hi');
+      s.set('hello');
+    });
+    await vi.advanceTimersToNextTimerAsync();
+
+    expect(callback).toHaveBeenCalledTimes(3);
+    expect(callback).toHaveBeenNthCalledWith(1, '안녕하세요');
+    expect(callback).toHaveBeenNthCalledWith(2, 'hi');
+    expect(callback).toHaveBeenNthCalledWith(3, 'hello');
   });
 
   it('여러 action으로 나눠서 set을 호출할 경우, action 수만큼 콜백 함수를 호출한다.', () => {
