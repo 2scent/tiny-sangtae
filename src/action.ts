@@ -17,14 +17,14 @@ export function registerCallback(key: symbol, callback: Callback): void {
   callbackPairs.push([key, callback]);
 }
 
-let actionRunning = false;
+let actionCount = 0;
 
 /**
  * Checks if an action is currently running.
  * @returns {boolean} - `true` if an action is currently running, `false` otherwise.
  */
 export function isActionRunning(): boolean {
-  return actionRunning;
+  return actionCount > 0;
 }
 
 /**
@@ -33,7 +33,7 @@ export function isActionRunning(): boolean {
  * @returns {void}
  */
 export function action(act: Callback): void {
-  actionRunning = true;
+  actionCount++;
 
   act();
 
@@ -48,5 +48,5 @@ export function action(act: Callback): void {
     callback();
   }
 
-  actionRunning = false;
+  actionCount--;
 }
