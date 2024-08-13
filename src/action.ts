@@ -1,14 +1,14 @@
-import type { Callback } from './type.ts';
+import type { VoidCallback } from './type.ts';
 
-const callbackMap = new Map<unknown, Callback>();
+const callbackMap = new Map<unknown, VoidCallback>();
 
 /**
  * Registers a new callback function associated with the given key.
  * @param {symbol} key - The key to associate the callback with.
- * @param {Callback} callback - The callback function to be registered.
+ * @param {VoidCallback} callback - The callback function to be registered.
  * @returns {void}
  */
-export function registerCallback(key: unknown, callback: Callback): void {
+export function registerCallback(key: unknown, callback: VoidCallback): void {
   callbackMap.set(key, callback);
 }
 
@@ -24,10 +24,10 @@ export function isActionRunning(): boolean {
 
 /**
  * Executes the provided action callback and then calls all registered callbacks.
- * @param {Callback} act - The action callback to be executed.
+ * @param {VoidCallback} act - The action callback to be executed.
  * @returns {void}
  */
-export function action(act: Callback): void {
+export function action(act: VoidCallback): void {
   actionCount++;
 
   act();
