@@ -2,42 +2,47 @@ import { registerCallback, isActionRunning } from './action.ts';
 import type { SubscribeCallback } from './type.ts';
 
 /**
- * A function type that takes the previous state and returns a new state
- * @template T The type of the state
+ * Represents a function that computes the next state based on the previous state.
+ * @param prev - The previous state.
+ * @returns The next state.
  */
 type NextFunction<T> = (prev: T) => T;
 
 /**
- * Represents either a new state value or a function to update the state
- * @template T The type of the state
+ * Represents either a new state value or a function to compute the next state.
  */
 type Next<T> = T | NextFunction<T>;
 
 /**
- * Interface for state management
- * @template State The type of the state
+ * Represents a state management object.
  */
 export interface Sangtae<State> {
   /**
-   * Returns the current state
-   * @returns {State} The current state
+   * Gets the current state.
+   * @returns The current state.
    */
   get: () => State;
 
   /**
-   * Updates the state
-   * @param {Next<State>} next The new state value or a function to update the state
+   * Sets a new state or updates the current state using a function.
+   * @param next The new state or a function to update the current state.
    */
   set: (next: Next<State>) => void;
 
   /**
-   * Subscribes to state changes
-   * @param {Callback} callback The function to be called when the state changes
-   * @returns {() => void} A function to unsubscribe
+   * Subscribes to state changes.
+   * @param callback The function to be called when the state changes.
+   * @param [key] - An optional key to identify the subscription.
+   * @returns A function to unsubscribe from state changes.
    */
   subscribe: (callback: SubscribeCallback<State>, key?: unknown) => () => void;
 }
 
+/**
+ * Creates a state management object.
+ * @param initialState - The initial state.
+ * @returns A Sangtae object for managing the state.
+ */
 export function sangtae<State>(initialState: State): Sangtae<State> {
   let state = initialState;
 
