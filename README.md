@@ -78,15 +78,37 @@ $counter.set(3);
 import { computed, sangtae } from 'tiny-sangtae';
 
 const $lastName = sangtae('Lee');
-const $fullName = computed($lastName, (ln) => ln + ' Hyanggi');
-console.log($fullName); // Lee Hyanggi
+const $fullName = computed($lastName, ln => ln + ' Hyanggi');
+console.log($fullName.get()); // Lee Hyanggi
+```
+
+`computed` can also create derived state from `computed`.
+
+```typescript
+import { computed, sangtae } from 'tiny-sangtae';
+
+const $lastName = sangtae('Lee');
+const $fullName = computed($lastName, ln => ln + ' Hyanggi');
+const $info = computed($fullName, fn => ({ name: fn, age: 20 }));
+console.log($info.get()); // { name: Lee Hyanggi, age: 20 }
+```
+
+`computed` can also create derived state from multiple `sangtae` or `computed`.
+
+```typescript
+import { computed, sangtae } from 'tiny-sangtae';
+
+const $lastName = sangtae('Lee');
+const $firstName = sangtae('Hyanggi');
+const $fullName = computed([$lastName, $firstName], (ln, fn) => `${ln} ${fn}`);
+console.log($fullName.get()); // Lee Hyanggi
 ```
 
 When the original `sangtae` changes, the `computed` state also changes.
 
 ```typescript
 $lastName.set('Kim');
-console.log($fullName); // Kim Hyanggi
+console.log($fullName.get()); // Kim Hyanggi
 ```
 
 Just like `sangtae`, you can call `subscribe` on `computed`.
@@ -108,36 +130,60 @@ $counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
 action(() => {
   $counter.set(1);
   $counter.set(2);
-  $counter.set(3); // $counter: 3
+  $counter.set(3);
+  $counter.set(4); // $counter: 4
 });
 ```
+
+If an `asynchronous` task is called within `action`, subsequent tasks are not included in the `action`.
+
+```typescript
+import { resolve } from 'path';
+
+$counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
+action(async () => {
+  $counter.set(1);
+  $counter.set(2);
+
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  $counter.set(3);
+  $counter.set(4);
+});
+```
+
+This code will first print `$counter: 2` to the console, and after 1 second, it will print`$counter: 3` and `$counter: 4`.
 
 ## Integration
 
 ### React
 
-Use [`@tiny-sangtae/react`](https://github.com/2scent/tiny-sangtae-react) and `useSangtae()` to get the state, and the component will re-render when `sangtae` changes.
+[`@tiny-sangtae/react`](https://github.com/2scent/tiny-sangtae-react) provides `useSangtae` hook.
+
+This hook takes either a `sangtae` or `computed` as an argument and returns the state.
 
 ```tsx
 // counter.ts
-import { sangtae } from 'tiny-sangtae';
+import { sangtae, computed } from 'tiny-sangtae';
 
 export const $counter = sangtae(0);
 
+export const $counterAdded10 = computed($counter, v => v + 10);
+
+export const increase = sangtae.set(v => v + 1);
+export const decrease = sangtae.set(v => v - 1);
+
 // Counter.tsx
-import { useStore } from '@tiny-sangtae/react';
-import { $counter } from './counter';
+import { useSangtae } from '@tiny-sangtae/react';
+import { $counter, $counterAdded10, increase, decrease } from './counter';
 
 export default function Counter() {
-  const [counter, setCounter] = useStore($counter);
-
-  const increase = () => setCounter((c) => c + 1);
-
-  const decrease = () => setCounter((c) => c - 1);
+  const counter = useStore($counter);
+  const counterAdded10 = useStore($counterAdded10);
 
   return (
     <div>
-      <h1>{counter}</h1>
+      <h1>{counter} + 10 = ${counterAdded10}</h1>
       <button type="button" onClick={increase}>+</button>
       <button type="button" onClick={decrease}>-</button>
     </div>
