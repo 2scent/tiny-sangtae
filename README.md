@@ -143,7 +143,7 @@ action(async () => {
   $counter.set(1);
   $counter.set(2);
 
-  await new Promise(resolve => setTimeout(resolve, 0));
+  await new Promise(resolve => setTimeout(resolve, 1000));
 
   $counter.set(3);
   $counter.set(4);
