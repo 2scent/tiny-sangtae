@@ -150,7 +150,7 @@ action(async () => {
 });
 ```
 
-This code will first print `$counter: 2` to the console, and after 1 second, it will print`$counter: 3` and `$counter: 4`.
+This code will first print `$counter: 2` to the console, and after 1 second, it will print `$counter: 3` and `$counter: 4`.
 
 ## Integration
 
