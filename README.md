@@ -138,8 +138,6 @@ action(() => {
 If an `asynchronous` task is called within `action`, subsequent tasks are not included in the `action`.
 
 ```typescript
-import { resolve } from 'path';
-
 $counter.subscribe(() => console.log(`$counter: ${$counter.get()}`));
 action(async () => {
   $counter.set(1);
