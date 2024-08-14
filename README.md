@@ -183,7 +183,7 @@ export default function Counter() {
 
   return (
     <div>
-      <h1>{counter} + 10 = ${counterAdded10}</h1>
+      <h1>{counter} + 10 = {counterAdded10}</h1>
       <button type="button" onClick={increase}>+</button>
       <button type="button" onClick={decrease}>-</button>
     </div>
