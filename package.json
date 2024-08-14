@@ -1,6 +1,6 @@
 {
   "name": "tiny-sangtae",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A state management library written in TypeScript. It can be used with Vanilla JS and React.",
   "keywords": [
     "store",
@@ -9,6 +9,11 @@
     "react"
   ],
   "author": "Lee Hyanggi <ad7549@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/2scent/tiny-sangtae"
+  },
+  "homepage": "https://github.com/2scent/tiny-sangtae#readme",
   "license": "MIT",
   "type": "module",
   "files": [
